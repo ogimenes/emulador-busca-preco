@@ -1,0 +1,43 @@
+name: Compilar APK Android
+
+# A automação roda toda vez que você fizer um "push" no repositório
+on: 
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar o Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Configurar o Java (Necessário para Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Configurar o Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Instalar o Flet
+        run: pip install -r requirements.txt
+
+      - name: Compilar o APK
+        run: flet build apk
+
+      - name: Disponibilizar o APK para Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: BuscaPreco-Gertec-Emulador
+          # O Flet joga o APK compilado dentro desta pasta
+          path: build/apk/**/*.apk

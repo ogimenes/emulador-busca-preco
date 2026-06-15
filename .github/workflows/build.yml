@@ -1,9 +1,12 @@
 name: Compilar APK Android
 
-# A automação roda toda vez que você fizer um "push" no repositório
 on: 
   push:
     branches: [ "main", "master" ]
+
+# Esta linha força o GitHub a usar o Node 24 e faz aquele aviso de deprecation sumir
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -29,15 +32,16 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Instalar o Flet
+      - name: Instalar o Flet e Dependências
         run: pip install -r requirements.txt
 
-      - name: Compilar o APK
-        run: flet build apk
+      - name: Compilar o APK (Modo Detalhado)
+        # O "-v" (verbose) faz o sistema imprimir todos os detalhes no log. 
+        # Assim, se falhar, saberemos o motivo exato.
+        run: flet build apk -v 
 
       - name: Disponibilizar o APK para Download
         uses: actions/upload-artifact@v4
         with:
           name: BuscaPreco-Gertec-Emulador
-          # O Flet joga o APK compilado dentro desta pasta
           path: build/apk/**/*.apk
